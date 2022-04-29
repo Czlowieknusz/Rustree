@@ -71,6 +71,10 @@ mod tests {
         });
 
         assert_eq!(parent.get_depth(), 4);
+        assert_eq!(older_child_2.get_depth(), 1);
+        assert_eq!(older_child_1.get_depth(), 3);
+        assert_eq!(younger_child.get_depth(), 2);
+        assert_eq!(even_younger_child.get_depth(), 1);
     }
 
     #[test]
@@ -97,5 +101,8 @@ mod tests {
         });
 
         assert_eq!(parent.get_depth(), 3);
+        assert_eq!(older_child_2.get_depth(), 2);
+        assert_eq!(older_child_1.get_depth(), 1);
+        assert_eq!(younger_child.get_depth(), 1);
     }
 }
