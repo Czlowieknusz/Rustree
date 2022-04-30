@@ -5,7 +5,7 @@ use std::rc::{Rc, Weak};
 #[allow(dead_code)]
 #[derive(Debug)]
 struct Node {
-    value: i32,
+    pub value: i32,
     parent: RefCell<Weak<Node>>,
     left_child: RefCell<Option<Rc<Node>>>,
     right_child: RefCell<Option<Rc<Node>>>,
@@ -24,7 +24,7 @@ impl Node {
         }
     }
 
-    fn add_node(&self /*, parent: &mut Node*/) {
+    fn add_node(&self, value: i32) {
         // let new_node = Rc::new(Node {
         //     value: 5,
         //     parent: RefCell::new(Weak::new()),
@@ -50,12 +50,13 @@ fn main() {
         left_child: RefCell::new(None),
         right_child: RefCell::new(None),
     };
-    node.add_node();
+    node.add_node(5);
     println!("Node is {:?} and it's depth is {}.", node, node.get_depth());
 }
 
 #[cfg(test)]
 mod tests {
+    use std::borrow::Borrow;
     use super::*;
 
     #[test]
@@ -141,5 +142,21 @@ mod tests {
         assert_eq!(older_child_2.get_depth(), 2);
         assert_eq!(older_child_1.get_depth(), 1);
         assert_eq!(younger_child.get_depth(), 1);
+    }
+
+    #[test]
+    fn add_left_then_right_node() {
+        let parent = Node {
+            value: 1,
+            parent: RefCell::new(Weak::new()),
+            left_child: RefCell::new(None),
+            right_child: RefCell::new(None),
+        };
+
+        parent.add_node(3);
+        parent.add_node(2);
+
+        assert_eq!(parent.left_child.into_inner().unwrap().as_ref().value, 3);
+        assert_eq!(parent.right_child.into_inner().unwrap().as_ref().value, 2);
     }
 }
