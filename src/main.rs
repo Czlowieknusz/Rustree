@@ -1,30 +1,54 @@
-use std::cell::RefCell;
+use std::cell::{RefCell};
+use std::cmp;
 use std::rc::{Rc, Weak};
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Node {
     value: i32,
     parent: RefCell<Weak<Node>>,
-    children: RefCell<Vec<Rc<Node>>>,
+    left_child: RefCell<Option<Rc<Node>>>,
+    right_child: RefCell<Option<Rc<Node>>>,
 }
 
 impl Node {
     fn get_depth(&self) -> u32 {
-        if self.children.borrow().is_empty() {
-            return 1
+        match (self.left_child.borrow().as_ref(), self.right_child.borrow().as_ref()) {
+            (None, None) => 1,
+            (Some(left), None) => left.get_depth() + 1,
+            (None, Some(right)) => right.get_depth() + 1,
+            (Some(left), Some(right)) => cmp::max(left.get_depth(), right.get_depth()) + 1,
         }
-        let mut depths = Vec::new();
-        for child in self.children.borrow().iter() {
-            depths.push(child.get_depth() + 1);
-        }
-        match depths.iter().max() {
-            Some(max) => *max,
-            None => 0
-        }
+    }
+
+    fn add_node(&self /*, parent: &mut Node*/) {
+        // let new_node = Rc::new(Node {
+        //     value: 5,
+        //     parent: RefCell::new(Weak::new()),
+        //     left_child: RefCell::new(None),
+        //     right_child: RefCell::new(None),
+        // });
+        //
+        // parent.
+        // let younger_child = Rc::new(Node {
+        //     value: 4,
+        //     parent: RefCell::new(Weak::new()),
+        //     left_child: RefCell::new(Option::from(Rc::clone(&even_younger_child))),
+        //     right_child: RefCell::new(None),
+        // });
+        //
     }
 }
 
 fn main() {
+    let node = Node {
+        value: 3,
+        parent: RefCell::new(Weak::new()),
+        left_child: RefCell::new(None),
+        right_child: RefCell::new(None),
+    };
+    node.add_node();
+    println!("Node is {:?} and it's depth is {}.", node, node.get_depth());
 }
 
 #[cfg(test)]
@@ -36,7 +60,8 @@ mod tests {
         let parent = Rc::new(Node {
             value: 1,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![]),
+            left_child: RefCell::new(None),
+            right_child: RefCell::new(None),
         });
 
         assert_eq!(parent.get_depth(), 1);
@@ -47,27 +72,32 @@ mod tests {
         let even_younger_child = Rc::new(Node {
             value: 5,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![]),
+            left_child: RefCell::new(None),
+            right_child: RefCell::new(None),
         });
         let younger_child = Rc::new(Node {
             value: 4,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![Rc::clone(&even_younger_child)]),
+            left_child: RefCell::new(Option::from(Rc::clone(&even_younger_child))),
+            right_child: RefCell::new(None),
         });
         let older_child_1 = Rc::new(Node {
             value: 3,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![Rc::clone(&younger_child)]),
+            left_child: RefCell::new(None),
+            right_child: RefCell::new(Option::from(Rc::clone(&younger_child))),
         });
         let older_child_2 = Rc::new(Node {
             value: 2,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![]),
+            left_child: RefCell::new(None),
+            right_child: RefCell::new(None),
         });
         let parent = Rc::new(Node {
             value: 1,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![Rc::clone(&older_child_1), Rc::clone(&older_child_2)]),
+            left_child: RefCell::new(Option::from(Rc::clone(&older_child_1))),
+            right_child: RefCell::new(Option::from(Rc::clone(&older_child_2))),
         });
 
         assert_eq!(parent.get_depth(), 4);
@@ -82,22 +112,26 @@ mod tests {
         let younger_child = Rc::new(Node {
             value: 4,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![]),
+            left_child: RefCell::new(None),
+            right_child: RefCell::new(None),
         });
         let older_child_1 = Rc::new(Node {
             value: 3,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![]),
+            left_child: RefCell::new(None),
+            right_child: RefCell::new(None),
         });
         let older_child_2 = Rc::new(Node {
             value: 2,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![Rc::clone(&younger_child)]),
+            left_child: RefCell::new(None),
+            right_child: RefCell::new(Option::from(Rc::clone(&older_child_1))),
         });
         let parent = Rc::new(Node {
             value: 1,
             parent: RefCell::new(Weak::new()),
-            children: RefCell::new(vec![Rc::clone(&older_child_1), Rc::clone(&older_child_2)]),
+            left_child: RefCell::new(Option::from(Rc::clone(&older_child_1))),
+            right_child: RefCell::new(Option::from(Rc::clone(&older_child_2))),
         });
 
         assert_eq!(parent.get_depth(), 3);
