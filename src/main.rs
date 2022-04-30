@@ -21,28 +21,15 @@ impl Node {
     }
 
     fn add_node(&mut self, value: i32) {
-        // if self.value == value {
-        //     println!("Value already present!");
-        //     return;
-        // }
-        // // match (&mut self.left_child, &mut self.right_child) {
-        // //     (Some(left), Some(right)) => {
-        // //
-        // //     },
-        // //     (None, _) =>,
-        // //     (Some(_), None) =>,
-        // // }
-        // let parent_node = if value > self.value { &mut self.right_child} else {&mut self.left_child};
-        // match parent_node. {
-        //     Some (&mut node) => node.
-        // //     (Some(mut left), Some(_)) => left.add_node(value),
-        //     /*Rc::get_mut(left).unwrap().add_node(value)*/
-        //     //
-        //     // )left.clone().add_node(value),
-        //     // (None, None) => self.left_child.borrow_mut().as_deref_mut() = Option::from(Box::new(Node::new(value))),
-        //     // (Some(_), _) => self.right_child.borrow_mut().as_deref_mut() = Option::from(Box::new(Node::new(value))),
-        //     // _ => {}
-        // }
+        if self.value == value {
+            println!("Value already present!");
+            return;
+        }
+        let parent_node = if value > self.value { &mut self.right_child} else {&mut self.left_child};
+        match parent_node {
+            &mut Some (ref mut node) => node.add_node(value),
+            &mut None => *parent_node = Option::from(Box::new(Node::new(value))),
+        }
     }
 
     fn new(value: i32)  -> Node {
@@ -81,7 +68,7 @@ mod tests {
     }
 
     #[test]
-    fn should_choose_larger_branch() {
+    fn left_depth_if_bigger() {
         let mut parent = Box::new(Node {
             value: 5,
             left_child: None,
@@ -96,7 +83,7 @@ mod tests {
     }
 
     #[test]
-    fn should_not_use_first_node_depth() {
+    fn right_depth_if_bigger() {
         let mut parent = Box::new(Node {
             value: 3,
             left_child: None,
@@ -110,18 +97,17 @@ mod tests {
         assert_eq!(parent.get_depth(), 3);
     }
 
-    // #[test]
-    // fn add_left_then_right_node() {
-    //     let mut parent = Node {
-    //         value: 1,
-    //         left_child: None,
-    //         right_child: None,
-    //     };
-    //
-    //     parent.add_node(3);
-    //     parent.add_node(2);
-    //
-    //     assert_eq!(parent.left_child.as_ref().unwrap().value, 3);
-    //     assert_eq!(parent.right_child.as_ref().unwrap().value, 2);
-    // }
+    #[test]
+    fn depth_is_one_hundred() {
+        let mut parent = Box::new(Node {
+            value: 0,
+            left_child: None,
+            right_child: None,
+        });
+        for i in 1..100 {
+            parent.add_node(i);
+        }
+
+        assert_eq!(parent.get_depth(), 100);
+    }
 }
