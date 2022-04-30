@@ -5,7 +5,6 @@ use std::rc::{Rc, Weak};
 #[derive(Debug)]
 struct Node {
     pub value: i32,
-    parent: RefCell<Weak<Node>>,
     left_child: RefCell<Option<Rc<Node>>>,
     right_child: RefCell<Option<Rc<Node>>>,
 }
@@ -24,24 +23,23 @@ impl Node {
     }
 
     fn add_node(&mut self, value: i32) {
-        match (
-            self.left_child.borrow_mut().as_ref(),
-            self.right_child.borrow_mut().as_ref(),
-        ) {
-            (Some(mut left), Some(_)) => left.add_node(value),
+        // match (
+        //     self.left_child.borrow_mut().as_ref(),
+        //     self.right_child.borrow_mut().as_ref(),
+        // ) {
+        //     (Some(mut left), Some(_)) => left.add_node(value),
             /*Rc::get_mut(left).unwrap().add_node(value)*/
             //
             // )left.clone().add_node(value),
             // (None, None) => self.left_child.borrow_mut().as_deref_mut() = Option::from(Rc::new(Node::new(value))),
             // (Some(_), _) => self.right_child.borrow_mut().as_deref_mut() = Option::from(Rc::new(Node::new(value))),
-            _ => {}
-        }
+            // _ => {}
+        // }
     }
 
     fn new(value: i32)  -> Node {
         Node {
             value,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(None),
             right_child: RefCell::new(None),
         }
@@ -51,7 +49,6 @@ impl Node {
 fn main() {
     let mut node = Node {
         value: 3,
-        parent: RefCell::new(Weak::new()),
         left_child: RefCell::new(None),
         right_child: RefCell::new(None),
     };
@@ -68,7 +65,6 @@ mod tests {
     fn single_node_tree() {
         let parent = Rc::new(Node {
             value: 1,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(None),
             right_child: RefCell::new(None),
         });
@@ -80,31 +76,26 @@ mod tests {
     fn should_choose_larger_branch() {
         let even_younger_child = Rc::new(Node {
             value: 5,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(None),
             right_child: RefCell::new(None),
         });
         let younger_child = Rc::new(Node {
             value: 4,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(Option::from(Rc::clone(&even_younger_child))),
             right_child: RefCell::new(None),
         });
         let older_child_1 = Rc::new(Node {
             value: 3,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(None),
             right_child: RefCell::new(Option::from(Rc::clone(&younger_child))),
         });
         let older_child_2 = Rc::new(Node {
             value: 2,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(None),
             right_child: RefCell::new(None),
         });
         let parent = Rc::new(Node {
             value: 1,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(Option::from(Rc::clone(&older_child_1))),
             right_child: RefCell::new(Option::from(Rc::clone(&older_child_2))),
         });
@@ -120,25 +111,21 @@ mod tests {
     fn should_not_use_first_node_depth() {
         let younger_child = Rc::new(Node {
             value: 4,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(None),
             right_child: RefCell::new(None),
         });
         let older_child_1 = Rc::new(Node {
             value: 3,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(None),
             right_child: RefCell::new(None),
         });
         let older_child_2 = Rc::new(Node {
             value: 2,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(None),
             right_child: RefCell::new(Option::from(Rc::clone(&older_child_1))),
         });
         let parent = Rc::new(Node {
             value: 1,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(Option::from(Rc::clone(&older_child_1))),
             right_child: RefCell::new(Option::from(Rc::clone(&older_child_2))),
         });
@@ -153,7 +140,6 @@ mod tests {
     fn add_left_then_right_node() {
         let mut parent = Node {
             value: 1,
-            parent: RefCell::new(Weak::new()),
             left_child: RefCell::new(None),
             right_child: RefCell::new(None),
         };
