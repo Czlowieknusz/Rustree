@@ -1,4 +1,4 @@
-use std::cell::{RefCell};
+use std::cell::RefCell;
 use std::cmp;
 use std::rc::{Rc, Weak};
 
@@ -13,7 +13,10 @@ struct Node {
 
 impl Node {
     fn get_depth(&self) -> u32 {
-        match (self.left_child.borrow().as_ref(), self.right_child.borrow().as_ref()) {
+        match (
+            self.left_child.borrow().as_ref(),
+            self.right_child.borrow().as_ref(),
+        ) {
             (None, None) => 1,
             (Some(left), None) => left.get_depth() + 1,
             (None, Some(right)) => right.get_depth() + 1,
