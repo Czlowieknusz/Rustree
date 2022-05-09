@@ -1,4 +1,4 @@
-use iced::{button, Alignment, Button, Column, Element, Sandbox, Text};
+use iced::{button, Alignment, Button, Column, Element, Row, Sandbox, Text};
 use rand::Rng;
 pub mod node;
 
@@ -40,17 +40,28 @@ impl Sandbox for Tree {
 
     fn view(&mut self) -> Element<Message> {
         let mut view = Column::new()
-            .padding(20)
-            .align_items(Alignment::Center)
             .push(
-                Button::new(&mut self.add_child_btn, Text::new("AddChild"))
-                    .on_press(Message::AddChild),
+                Row::new()
+                    .padding(20)
+                    .align_items(Alignment::Center)
+                    .push(
+                        Button::new(&mut self.add_child_btn, Text::new("AddChild"))
+                            .on_press(Message::AddChild),
+                    )
+                    .push(
+                        Button::new(&mut self.del_child_btn, Text::new("DelChild"))
+                            .on_press(Message::DelChild),
+                    ),
             )
-            .push(Text::new(self.root.get_depth().to_string()).size(50))
             .push(
-                Button::new(&mut self.del_child_btn, Text::new("DelChild"))
-                    .on_press(Message::DelChild),
+                Row::new()
+                    .align_items(Alignment::Center)
+                    .push(Text::new(self.root.get_depth().to_string()).size(50)),
             );
         view.into()
     }
+}
+
+impl Tree {
+    fn print_tree(self) {}
 }
