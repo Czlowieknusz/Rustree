@@ -1,18 +1,7 @@
-use tree::Node;
+use iced::{Application, Settings};
 
 mod iced_tree;
 
-fn main() {
-    let mut node = Node::new(3);
-    println!(
-        "Before adding Node is {:?} and it's depth is {}.",
-        node,
-        node.get_depth()
-    );
-    node.add_node(5);
-    println!(
-        "After adding Node is {:?} and it's depth is {}.",
-        node,
-        node.get_depth()
-    );
+fn main() -> Result<(), iced::Error> {
+    iced_tree::Counter::run(Settings::default())
 }
