@@ -1,6 +1,6 @@
 use std::cmp;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Node {
     pub value: i32,
     left: Option<Box<Node>>,

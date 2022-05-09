@@ -1,5 +1,7 @@
 use tree::Node;
 
+mod iced_tree;
+
 fn main() {
     let mut node = Node::new(3);
     println!(

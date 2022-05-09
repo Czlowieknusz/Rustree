@@ -1,5 +1,5 @@
 use iced::{button, Alignment, Button, Column, Element, Sandbox, Text};
-use node::Node;
+use tree::Node;
 
 #[derive(Default)]
 pub struct Tree {
@@ -9,6 +9,8 @@ pub struct Tree {
 #[derive(Default)]
 pub struct Counter {
     value: u32,
+    increment_button: button::State,
+    decrement_button: button::State,
     values_history: Vec<u32>,
 }
 
