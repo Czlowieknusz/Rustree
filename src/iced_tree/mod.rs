@@ -1,14 +1,6 @@
 use iced::{button, Alignment, Button, Column, Element, Sandbox, Text};
-
+use rand::Rng;
 pub mod node;
-
-#[derive(Default)]
-pub struct Counter {
-    value: u32,
-    increment_button: button::State,
-    decrement_button: button::State,
-    values_history: Vec<u32>,
-}
 
 #[derive(Default)]
 pub struct Tree {
@@ -19,11 +11,11 @@ pub struct Tree {
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
-    IncrementPressed,
-    DecrementPressed,
+    AddChild,
+    DelChild,
 }
 
-impl Sandbox for Counter {
+impl Sandbox for Tree {
     type Message = Message;
 
     fn new() -> Self {
@@ -36,13 +28,12 @@ impl Sandbox for Counter {
 
     fn update(&mut self, message: Message) {
         match message {
-            Message::IncrementPressed => {
-                self.value += 1;
-                self.values_history.push(self.value);
+            Message::AddChild => {
+                let mut rng = rand::thread_rng();
+                self.root.add_node(rng.gen());
             }
-            Message::DecrementPressed => {
-                self.value -= 1;
-                self.values_history.pop();
+            Message::DelChild => {
+                println!("Not implemented yet!");
             }
         }
     }
@@ -52,18 +43,14 @@ impl Sandbox for Counter {
             .padding(20)
             .align_items(Alignment::Center)
             .push(
-                Button::new(&mut self.increment_button, Text::new("Increment"))
-                    .on_press(Message::IncrementPressed),
+                Button::new(&mut self.add_child_btn, Text::new("AddChild"))
+                    .on_press(Message::AddChild),
             )
-            .push(Text::new(self.value.to_string()).size(50))
+            .push(Text::new(self.root.get_depth().to_string()).size(50))
             .push(
-                Button::new(&mut self.decrement_button, Text::new("Decrement"))
-                    .on_press(Message::DecrementPressed),
+                Button::new(&mut self.del_child_btn, Text::new("DelChild"))
+                    .on_press(Message::DelChild),
             );
-
-        for v in &self.values_history {
-            view = view.push(Text::new(v.to_string()).size(50));
-        }
         view.into()
     }
 }
