@@ -1,4 +1,4 @@
-use iced::{button, Alignment, Button, Column, Element, Row, Sandbox, Text};
+use iced::{button, Alignment, Button, Column, Element, Renderer, Row, Sandbox, Text};
 use rand::Rng;
 pub mod node;
 
@@ -58,10 +58,21 @@ impl Sandbox for Tree {
                     .align_items(Alignment::Center)
                     .push(Text::new(self.root.get_depth().to_string()).size(50)),
             );
+
+        // Print the tree
+
+        view = view.push(
+            Row::new()
+                .align_items(Alignment::Center)
+                .push(Text::new(self.root.value.to_string()).size(50)),
+        );
+        print_tree(&self.root);
+        // Finish printing the tree
+
         view.into()
     }
 }
 
-impl Tree {
-    fn print_tree(self) {}
+fn print_tree(node: &node::Node) {
+    println!("Node {} with depth {}.", node.value, node.get_depth());
 }
