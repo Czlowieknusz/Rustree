@@ -1,10 +1,6 @@
 use iced::{button, Alignment, Button, Column, Element, Sandbox, Text};
-use tree::Node;
 
-#[derive(Default)]
-pub struct Tree {
-    root: Node,
-}
+pub mod node;
 
 #[derive(Default)]
 pub struct Counter {
@@ -12,6 +8,13 @@ pub struct Counter {
     increment_button: button::State,
     decrement_button: button::State,
     values_history: Vec<u32>,
+}
+
+#[derive(Default)]
+pub struct Tree {
+    root: node::Node,
+    add_child_btn: button::State,
+    del_child_btn: button::State,
 }
 
 #[derive(Debug, Clone, Copy)]

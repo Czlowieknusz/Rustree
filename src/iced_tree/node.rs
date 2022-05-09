@@ -48,22 +48,14 @@ mod tests {
 
     #[test]
     fn single_node_tree() {
-        let root = Box::new(Node {
-            value: 1,
-            left: None,
-            right: None,
-        });
+        let root = Box::new(Node::new(1));
 
         assert_eq!(root.get_depth(), 1);
     }
 
     #[test]
     fn left_depth_if_bigger() {
-        let mut root = Box::new(Node {
-            value: 5,
-            left: None,
-            right: None,
-        });
+        let mut root = Box::new(Node::new(5));
         root.add_node(3);
         root.add_node(2);
         root.add_node(1);
@@ -74,11 +66,7 @@ mod tests {
 
     #[test]
     fn right_depth_if_bigger() {
-        let mut root = Box::new(Node {
-            value: 3,
-            left: None,
-            right: None,
-        });
+        let mut root = Box::new(Node::new(3));
         root.add_node(5);
         root.add_node(4);
         root.add_node(6);
@@ -89,11 +77,7 @@ mod tests {
 
     #[test]
     fn depth_is_one_hundred() {
-        let mut root = Box::new(Node {
-            value: 0,
-            left: None,
-            right: None,
-        });
+        let mut root = Box::new(Node::new(0));
         for i in 1..100 {
             root.add_node(i);
         }
