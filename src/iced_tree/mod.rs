@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use iced::{button, Alignment, Button, Column, Element, Row, Sandbox, Text};
 use rand::Rng;
 
@@ -76,9 +74,8 @@ impl Sandbox for Tree {
     }
 }
 
-fn print_tree(node: &node::Node) /* -> Vec<Vec<Option<node::Node>>> */
-{
-    let mut values = vec![vec![node.value]];
+fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
+    let mut values = vec![vec![Some(node.value)]];
 
     let mut nodes = vec![&node];
 
@@ -90,17 +87,17 @@ fn print_tree(node: &node::Node) /* -> Vec<Vec<Option<node::Node>>> */
         for node in nodes.iter() {
             match node.left.as_ref() {
                 Some(n) => {
-                    values[last_depth].push(n.value);
+                    values[last_depth].push(Some(n.value));
                     tmp_nodes.push(n.as_ref());
                 }
-                None => (),
+                None => values[last_depth].push(None),
             }
             match node.right.as_ref() {
                 Some(n) => {
-                    values[last_depth].push(n.value);
+                    values[last_depth].push(Some(n.value));
                     tmp_nodes.push(&n);
                 }
-                None => (),
+                None => values[last_depth].push(None),
             }
         }
 
@@ -126,4 +123,17 @@ fn print_tree(node: &node::Node) /* -> Vec<Vec<Option<node::Node>>> */
 
     println!("Node {} with depth {}.", node.value, node.get_depth());
     // nodes
+    values
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn single_node_tree() {
+        let root = Box::new(node::Node::new(1));
+
+        assert_eq!(root.get_depth(), 1);
+    }
 }
