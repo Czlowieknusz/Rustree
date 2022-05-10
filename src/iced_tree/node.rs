@@ -1,6 +1,6 @@
 use std::cmp;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 pub struct Node {
     pub value: i32,
     pub left: Option<Box<Node>>,

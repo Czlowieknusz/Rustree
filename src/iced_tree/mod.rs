@@ -86,27 +86,8 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
         for node in nodes.iter() {
             match node {
                 Some(node) => {
-                    fill_values_and_nodes(node, insert_row, &mut values, &mut tmp_nodes);
-                    match node.left.as_ref() {
-                        Some(n) => {
-                            values[insert_row].push(Some(n.value));
-                            tmp_nodes.push(Some(n.as_ref()));
-                        }
-                        None => {
-                            values[insert_row].push(None);
-                            tmp_nodes.push(None);
-                        }
-                    }
-                    match node.right.as_ref() {
-                        Some(n) => {
-                            values[insert_row].push(Some(n.value));
-                            tmp_nodes.push(Some(&n));
-                        }
-                        None => {
-                            values[insert_row].push(None);
-                            tmp_nodes.push(None);
-                        }
-                    }
+                    fill_values_and_nodes(&node.left, insert_row, &mut values, &mut tmp_nodes);
+                    fill_values_and_nodes(&node.right, insert_row, &mut values, &mut tmp_nodes);
                 }
                 None => {
                     values[insert_row].push(None);
@@ -127,12 +108,12 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
 }
 
 fn fill_values_and_nodes<'a>(
-    node: &'a node::Node,
+    node: &'a Option<Box<node::Node>>,
     insert_row: usize,
     values: &mut Vec<Vec<Option<i32>>>,
     nodes: &mut Vec<Option<&'a node::Node>>,
 ) {
-    match node.left.as_ref() {
+    match node.as_ref() {
         Some(n) => {
             values[insert_row].push(Some(n.value));
             nodes.push(Some(&n));
@@ -185,5 +166,40 @@ mod tests {
         let v = vec![Some(&n1), Some(&n2)];
 
         assert_eq!(is_some_in_vec(&v), true);
+    }
+
+    #[test]
+    fn should_add_some() {
+        let node = Option::from(Box::new(node::Node::new(3)));
+        let insert_row = 0;
+        let mut values = vec![vec![]];
+        let mut nodes = vec![];
+
+        fill_values_and_nodes(&node, insert_row, &mut values, &mut nodes);
+
+        let expected_values = vec![vec![Some(3)]];
+        let tmp = node.as_ref().unwrap().as_ref();
+        let expected_nodes = vec![Some(tmp)];
+        assert_eq!(values.len(), 1);
+        assert_eq!(nodes.len(), 1);
+        assert_eq!(values, expected_values);
+        assert_eq!(nodes, expected_nodes);
+    }
+
+    #[test]
+    fn should_add_none() {
+        let node = None;
+        let insert_row = 0;
+        let mut values = vec![vec![]];
+        let mut nodes = vec![];
+
+        fill_values_and_nodes(&node, insert_row, &mut values, &mut nodes);
+
+        let expected_values = vec![vec![None]];
+        let expected_nodes = vec![None];
+        assert_eq!(values.len(), 1);
+        assert_eq!(nodes.len(), 1);
+        assert_eq!(values, expected_values);
+        assert_eq!(nodes, expected_nodes);
     }
 }
