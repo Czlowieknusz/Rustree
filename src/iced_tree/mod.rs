@@ -91,19 +91,27 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
                             values[last_depth].push(Some(n.value));
                             tmp_nodes.push(Some(n.as_ref()));
                         }
-                        None => values[last_depth].push(None),
+                        None => {
+                            values[last_depth].push(None);
+                            tmp_nodes.push(None);
+                        }
                     }
                     match node.right.as_ref() {
                         Some(n) => {
                             values[last_depth].push(Some(n.value));
                             tmp_nodes.push(Some(&n));
                         }
-                        None => values[last_depth].push(None),
+                        None => {
+                            values[last_depth].push(None);
+                            tmp_nodes.push(None);
+                        }
                     }
                 }
                 None => {
                     values[last_depth].push(None);
                     values[last_depth].push(None);
+                    tmp_nodes.push(None);
+                    tmp_nodes.push(None);
                 }
             }
         }
@@ -116,6 +124,8 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
 
     values
 }
+
+// fn fill
 
 fn is_some_in_vec(v: &Vec<Option<&node::Node>>) -> bool {
     v.iter().any(|&n| match n {
