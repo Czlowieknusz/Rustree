@@ -141,7 +141,7 @@ mod tests {
         let root = Box::new(node::Node::new(1));
 
         let left = print_tree(&root);
-        let right = vec![vec![Some(1)]];
+        let right = vec![vec![Some(1)], vec![None, None]];
         assert_eq!(left, right);
     }
 
