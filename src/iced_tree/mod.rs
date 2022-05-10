@@ -161,7 +161,7 @@ mod tests {
 
     #[test]
     fn all_some() {
-        let n1 = node::Node::new(3);
+        let n1 = node::Node::new(2);
         let n2 = node::Node::new(3);
         let v = vec![Some(&n1), Some(&n2)];
 
@@ -180,8 +180,6 @@ mod tests {
         let expected_values = vec![vec![Some(3)]];
         let tmp = node.as_ref().unwrap().as_ref();
         let expected_nodes = vec![Some(tmp)];
-        assert_eq!(values.len(), 1);
-        assert_eq!(nodes.len(), 1);
         assert_eq!(values, expected_values);
         assert_eq!(nodes, expected_nodes);
     }
@@ -197,8 +195,6 @@ mod tests {
 
         let expected_values = vec![vec![None]];
         let expected_nodes = vec![None];
-        assert_eq!(values.len(), 1);
-        assert_eq!(nodes.len(), 1);
         assert_eq!(values, expected_values);
         assert_eq!(nodes, expected_nodes);
     }
