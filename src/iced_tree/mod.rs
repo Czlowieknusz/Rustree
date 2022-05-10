@@ -77,11 +77,10 @@ impl Sandbox for Tree {
 fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
     let mut values = vec![vec![Some(node.value)]];
 
-    let mut nodes = vec![Some(&node)];
-
-    let mut last_depth = values.len();
+    let mut nodes = vec![Some(node)];
 
     loop {
+        let last_depth = values.len();
         values.push(vec![]);
         let mut tmp_nodes: Vec<Option<&node::Node>> = vec![];
         for node in nodes.iter() {
@@ -112,15 +111,9 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
         if !is_some_in_vec(&tmp_nodes) {
             break;
         }
-
-        if last_depth == nodes.len() {
-            break;
-        }
-        last_depth = nodes.len();
+        nodes = tmp_nodes;
     }
 
-    println!("Node {} with depth {}.", node.value, node.get_depth());
-    // nodes
     values
 }
 
