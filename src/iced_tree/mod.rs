@@ -80,36 +80,37 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
     let mut nodes = vec![Some(node)];
 
     loop {
-        let last_depth = values.len();
+        let insert_row = values.len();
         values.push(vec![]);
         let mut tmp_nodes: Vec<Option<&node::Node>> = vec![];
         for node in nodes.iter() {
             match node {
                 Some(node) => {
+                    fill_values_and_nodes(node, insert_row, &mut values, &mut tmp_nodes);
                     match node.left.as_ref() {
                         Some(n) => {
-                            values[last_depth].push(Some(n.value));
+                            values[insert_row].push(Some(n.value));
                             tmp_nodes.push(Some(n.as_ref()));
                         }
                         None => {
-                            values[last_depth].push(None);
+                            values[insert_row].push(None);
                             tmp_nodes.push(None);
                         }
                     }
                     match node.right.as_ref() {
                         Some(n) => {
-                            values[last_depth].push(Some(n.value));
+                            values[insert_row].push(Some(n.value));
                             tmp_nodes.push(Some(&n));
                         }
                         None => {
-                            values[last_depth].push(None);
+                            values[insert_row].push(None);
                             tmp_nodes.push(None);
                         }
                     }
                 }
                 None => {
-                    values[last_depth].push(None);
-                    values[last_depth].push(None);
+                    values[insert_row].push(None);
+                    values[insert_row].push(None);
                     tmp_nodes.push(None);
                     tmp_nodes.push(None);
                 }
@@ -125,7 +126,23 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
     values
 }
 
-// fn fill
+fn fill_values_and_nodes<'a>(
+    node: &'a node::Node,
+    insert_row: usize,
+    values: &mut Vec<Vec<Option<i32>>>,
+    nodes: &mut Vec<Option<&'a node::Node>>,
+) {
+    match node.left.as_ref() {
+        Some(n) => {
+            values[insert_row].push(Some(n.value));
+            nodes.push(Some(&n));
+        }
+        None => {
+            values[insert_row].push(None);
+            nodes.push(None);
+        }
+    };
+}
 
 fn is_some_in_vec(v: &Vec<Option<&node::Node>>) -> bool {
     v.iter().any(|&n| match n {
