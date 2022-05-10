@@ -1,13 +1,13 @@
 use std::rc::Rc;
 
-use iced::{button, Alignment, Button, Column, Element, Renderer, Row, Sandbox, Text};
+use iced::{button, Alignment, Button, Column, Element, Row, Sandbox, Text};
 use rand::Rng;
 
 pub mod node;
 
 #[derive(Default)]
 pub struct Tree {
-    root: Rc<node::Node>,
+    root: Box<node::Node>,
     add_child_btn: button::State,
     del_child_btn: button::State,
 }
@@ -69,32 +69,39 @@ impl Sandbox for Tree {
                 .align_items(Alignment::Center)
                 .push(Text::new(self.root.value.to_string()).size(50)),
         );
-        print_tree(self.root.clone());
+        print_tree(&self.root);
         // Finish printing the tree
 
         view.into()
     }
 }
 
-fn print_tree(node: Rc<node::Node>) /* -> Vec<Vec<Option<node::Node>>> */
+fn print_tree(node: &node::Node) /* -> Vec<Vec<Option<node::Node>>> */
 {
-    // let mut values = vec![vec![]];
+    let mut values = vec![vec![node.value]];
 
-    let mut nodes = vec![vec![Option::from(Rc::clone(&node))]];
+    let mut nodes = vec![&node];
 
-    let mut last_depth = nodes.len();
+    let mut last_depth = values.len();
 
     loop {
-        nodes.push(Vec::new());
-        let non_leaf_nodes = &nodes[nodes.len() - 2];
-        for node in non_leaf_nodes {
-            nodes
-                .last()
-                .unwrap()
-                .push(match node.as_ref().unwrap().left {
-                    None => None,
-                    Some(n) => Option::from(Rc::clone(&n)),
-                });
+        values.push(vec![]);
+        let mut tmp_nodes: Vec<&node::Node> = vec![];
+        for node in nodes.iter() {
+            match node.left.as_ref() {
+                Some(n) => {
+                    values[last_depth].push(n.value);
+                    tmp_nodes.push(n.as_ref());
+                }
+                None => (),
+            }
+            match node.right.as_ref() {
+                Some(n) => {
+                    values[last_depth].push(n.value);
+                    tmp_nodes.push(&n);
+                }
+                None => (),
+            }
         }
 
         if last_depth == nodes.len() {
@@ -103,17 +110,17 @@ fn print_tree(node: Rc<node::Node>) /* -> Vec<Vec<Option<node::Node>>> */
         last_depth = nodes.len();
     }
 
-    for vec in nodes {
-        for n in vec {
-            println!(
-                "{}",
-                match n {
-                    Some(n) => n.value.to_string(),
-                    None => "-".to_string(),
-                }
-            );
-        }
-    }
+    // for vec in nodes {
+    //     for n in vec {
+    //         println!(
+    //             "{}",
+    //             match n {
+    //                 Some(n) => n.value.to_string(),
+    //                 None => "-".to_string(),
+    //             }
+    //         );
+    //     }
+    // }
 
     // nodes.into_iter().map(|n| n.value).collect();
 
