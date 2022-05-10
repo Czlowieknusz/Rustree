@@ -77,28 +77,40 @@ impl Sandbox for Tree {
 fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
     let mut values = vec![vec![Some(node.value)]];
 
-    let mut nodes = vec![&node];
+    let mut nodes = vec![Some(&node)];
 
     let mut last_depth = values.len();
 
     loop {
         values.push(vec![]);
-        let mut tmp_nodes: Vec<&node::Node> = vec![];
+        let mut tmp_nodes: Vec<Option<&node::Node>> = vec![];
         for node in nodes.iter() {
-            match node.left.as_ref() {
-                Some(n) => {
-                    values[last_depth].push(Some(n.value));
-                    tmp_nodes.push(n.as_ref());
+            match node {
+                Some(node) => {
+                    match node.left.as_ref() {
+                        Some(n) => {
+                            values[last_depth].push(Some(n.value));
+                            tmp_nodes.push(Some(n.as_ref()));
+                        }
+                        None => values[last_depth].push(None),
+                    }
+                    match node.right.as_ref() {
+                        Some(n) => {
+                            values[last_depth].push(Some(n.value));
+                            tmp_nodes.push(Some(&n));
+                        }
+                        None => values[last_depth].push(None),
+                    }
                 }
-                None => values[last_depth].push(None),
-            }
-            match node.right.as_ref() {
-                Some(n) => {
-                    values[last_depth].push(Some(n.value));
-                    tmp_nodes.push(&n);
+                None => {
+                    values[last_depth].push(None);
+                    values[last_depth].push(None);
                 }
-                None => values[last_depth].push(None),
             }
+        }
+
+        if !is_some_in_vec(&tmp_nodes) {
+            break;
         }
 
         if last_depth == nodes.len() {
@@ -107,23 +119,16 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
         last_depth = nodes.len();
     }
 
-    // for vec in nodes {
-    //     for n in vec {
-    //         println!(
-    //             "{}",
-    //             match n {
-    //                 Some(n) => n.value.to_string(),
-    //                 None => "-".to_string(),
-    //             }
-    //         );
-    //     }
-    // }
-
-    // nodes.into_iter().map(|n| n.value).collect();
-
     println!("Node {} with depth {}.", node.value, node.get_depth());
     // nodes
     values
+}
+
+fn is_some_in_vec(v: &Vec<Option<&node::Node>>) -> bool {
+    v.iter().any(|&n| match n {
+        Some(_) => true,
+        None => false,
+    })
 }
 
 #[cfg(test)]
@@ -134,6 +139,31 @@ mod tests {
     fn single_node_tree() {
         let root = Box::new(node::Node::new(1));
 
-        assert_eq!(root.get_depth(), 1);
+        let left = print_tree(&root);
+        let right = vec![vec![Some(1)]];
+        assert_eq!(left, right);
+    }
+
+    #[test]
+    fn one_some() {
+        let n = node::Node::new(3);
+        let v = vec![None, None, Some(&n)];
+        assert_eq!(is_some_in_vec(&v), true);
+    }
+
+    #[test]
+    fn no_some() {
+        let v = vec![None, None, None, None];
+
+        assert_eq!(is_some_in_vec(&v), false);
+    }
+
+    #[test]
+    fn all_some() {
+        let n1 = node::Node::new(3);
+        let n2 = node::Node::new(3);
+        let v = vec![Some(&n1), Some(&n2)];
+
+        assert_eq!(is_some_in_vec(&v), true);
     }
 }
