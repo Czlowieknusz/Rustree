@@ -1,10 +1,10 @@
-use std::cmp;
+use std::{cmp, rc::Rc};
 
 #[derive(Debug, Default)]
 pub struct Node {
     pub value: i32,
-    left: Option<Box<Node>>,
-    right: Option<Box<Node>>,
+    pub left: Option<Rc<Node>>,
+    pub right: Option<Rc<Node>>,
 }
 
 impl Node {
@@ -29,7 +29,7 @@ impl Node {
         };
         match subtree_root_node {
             &mut Some(ref mut subtree_root_node) => subtree_root_node.add_node(value),
-            &mut None => *subtree_root_node = Option::from(Box::new(Node::new(value))),
+            &mut None => *subtree_root_node = Option::from(Rc::new(Node::new(value))),
         }
     }
 
