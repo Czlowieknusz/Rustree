@@ -31,7 +31,7 @@ impl Sandbox for Tree {
         match message {
             Message::AddChild => {
                 let mut rng = rand::thread_rng();
-                self.root.add_node(rng.gen());
+                self.root.add_node(rng.gen::<i32>() % 10);
             }
             Message::DelChild => {
                 println!("Not implemented yet!");
@@ -40,34 +40,39 @@ impl Sandbox for Tree {
     }
 
     fn view(&mut self) -> Element<Message> {
-        let mut view = Column::new()
-            .push(
-                Row::new()
-                    .padding(20)
-                    .align_items(Alignment::Center)
-                    .push(
-                        Button::new(&mut self.add_child_btn, Text::new("AddChild"))
-                            .on_press(Message::AddChild),
-                    )
-                    .push(
-                        Button::new(&mut self.del_child_btn, Text::new("DelChild"))
-                            .on_press(Message::DelChild),
-                    ),
-            )
-            .push(
-                Row::new()
-                    .align_items(Alignment::Center)
-                    .push(Text::new(self.root.get_depth().to_string()).size(50)),
-            );
+        let mut view = Column::new().push(
+            Row::new()
+                .padding(20)
+                .align_items(Alignment::Center)
+                .push(
+                    Button::new(&mut self.add_child_btn, Text::new("AddChild"))
+                        .on_press(Message::AddChild),
+                )
+                .push(
+                    Button::new(&mut self.del_child_btn, Text::new("DelChild"))
+                        .on_press(Message::DelChild),
+                ),
+        );
 
         // Print the tree
 
+        let depth = format!("Current depth is {}", self.root.get_depth());
         view = view.push(
             Row::new()
                 .align_items(Alignment::Center)
-                .push(Text::new(self.root.value.to_string()).size(50)),
+                .push(Text::new(depth.to_string()).size(50)),
         );
-        print_tree(&self.root);
+        let printable_nodes = print_tree(&self.root);
+
+        for nodes in printable_nodes {
+            view = view.push(Row::new()).align_items(Alignment::Center);
+            for n in nodes {
+                match n {
+                    Some(n) => view = view.push(Text::new(n.to_string()).size(25)),
+                    None => view = view.push(Text::new("leaf".to_string()).size(25)),
+                }
+            }
+        }
         // Finish printing the tree
 
         view.into()
