@@ -65,13 +65,14 @@ impl Sandbox for Tree {
         let printable_nodes = print_tree(&self.root);
 
         for nodes in printable_nodes {
-            view = view.push(Row::new()).align_items(Alignment::Center);
+            let mut tree_layer = Row::new().padding(20);
             for n in nodes {
                 match n {
-                    Some(n) => view = view.push(Text::new(n.to_string()).size(25)),
-                    None => view = view.push(Text::new("leaf".to_string()).size(25)),
+                    Some(n) => tree_layer = tree_layer.push(Text::new(n.to_string()).size(25)),
+                    None => tree_layer = tree_layer.push(Text::new("leaf".to_string()).size(25)),
                 }
             }
+            view = view.push(Column::new().push(tree_layer));
         }
         // Finish printing the tree
 
