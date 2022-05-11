@@ -19,7 +19,7 @@ impl Node {
 
     pub fn add_node(&mut self, value: i32) {
         if self.value == value {
-            println!("Value already present!");
+            println!("Value {} already present!", value);
             return;
         }
         let subtree_root_node = if value > self.value {
