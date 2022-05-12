@@ -85,6 +85,12 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
 
     let mut nodes = vec![Some(node)];
 
+    // let mut ret_val = Column::new().push(Row::new().padding(15));
+
+    // loop {
+
+    // }
+
     loop {
         let insert_row = values.len();
         values.push(vec![]);
@@ -111,6 +117,15 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
     }
 
     values
+}
+
+fn calc_padding(n: &node::Node) -> i32 {
+    let mut paddings = vec![1];
+    let d = n.get_depth() as usize;
+    for i in 0..d {
+        paddings.push(paddings[i] * 2 + 1);
+    }
+    paddings.last().copied().unwrap()
 }
 
 fn fill_values_and_nodes<'a>(
@@ -141,6 +156,30 @@ fn is_some_in_vec(v: &Vec<Option<&node::Node>>) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn padding_for_one() {
+        let n = node::Node::new(1);
+        assert_eq!(calc_padding(&n), 3);
+    }
+
+    #[test]
+    fn padding_for_three() {
+        let mut n = node::Node::new(1);
+        n.add_node(2);
+        n.add_node(3);
+        assert_eq!(calc_padding(&n), 15);
+    }
+
+    #[test]
+    fn padding_for_five() {
+        let mut n = node::Node::new(1);
+        n.add_node(2);
+        n.add_node(3);
+        n.add_node(4);
+        n.add_node(5);
+        assert_eq!(calc_padding(&n), 63);
+    }
 
     #[test]
     fn single_node_tree() {
