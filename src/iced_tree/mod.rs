@@ -90,10 +90,10 @@ fn print_tree(node: &node::Node) -> Column<Message> {
                 }
             }
         }
-        depth -= 1;
         if !is_some_in_vec(&nodes) {
             break;
         }
+        depth -= 1;
         nodes = get_next_iter_nodes(nodes);
     }
     ret
