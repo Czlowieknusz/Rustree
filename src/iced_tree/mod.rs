@@ -160,30 +160,6 @@ mod tests {
     }
 
     #[test]
-    fn single_node_tree() {
-        let root = Box::new(node::Node::new(1));
-
-        let right = vec![vec![Some(1)], vec![None, None]];
-        assert_eq!(print_tree(&root), right);
-    }
-
-    #[test]
-    fn multiple_nodes_tree() {
-        let mut root = Box::new(node::Node::new(3));
-        root.add_node(1);
-        root.add_node(2);
-        root.add_node(5);
-
-        let right = vec![
-            vec![Some(3)],
-            vec![Some(1), Some(5)],
-            vec![None, Some(2), None, None],
-            vec![None, None, None, None, None, None, None, None],
-        ];
-        assert_eq!(print_tree(&root), right);
-    }
-
-    #[test]
     fn one_some() {
         let n = node::Node::new(3);
         let v = vec![None, None, Some(&n)];
