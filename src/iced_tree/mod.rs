@@ -88,33 +88,33 @@ fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
     // let mut ret_val = Column::new().push(Row::new().padding(15));
 
     // loop {
-
+    //     nodes = get_next_iter_nodes(nodes);
     // }
 
-    loop {
-        let insert_row = values.len();
-        values.push(vec![]);
-        let mut tmp_nodes: Vec<Option<&node::Node>> = vec![];
-        for node in nodes.iter() {
-            match node {
-                Some(node) => {
-                    fill_values_and_nodes(&node.left, insert_row, &mut values, &mut tmp_nodes);
-                    fill_values_and_nodes(&node.right, insert_row, &mut values, &mut tmp_nodes);
-                }
-                None => {
-                    values[insert_row].push(None);
-                    values[insert_row].push(None);
-                    tmp_nodes.push(None);
-                    tmp_nodes.push(None);
-                }
-            }
-        }
+    // loop {
+    //     let insert_row = values.len();
+    //     values.push(vec![]);
+    //     let mut tmp_nodes: Vec<Option<&node::Node>> = vec![];
+    //     for node in nodes.iter() {
+    //         match node {
+    //             Some(node) => {
+    //                 fill_values_and_nodes(&node.left, insert_row, &mut values, &mut tmp_nodes);
+    //                 fill_values_and_nodes(&node.right, insert_row, &mut values, &mut tmp_nodes);
+    //             }
+    //             None => {
+    //                 values[insert_row].push(None);
+    //                 values[insert_row].push(None);
+    //                 tmp_nodes.push(None);
+    //                 tmp_nodes.push(None);
+    //             }
+    //         }
+    //     }
 
-        if !is_some_in_vec(&tmp_nodes) {
-            break;
-        }
-        nodes = tmp_nodes;
-    }
+    //     if !is_some_in_vec(&tmp_nodes) {
+    //         break;
+    //     }
+    //     nodes = tmp_nodes;
+    // }
 
     values
 }
@@ -128,22 +128,27 @@ fn calc_padding(n: &node::Node) -> i32 {
     paddings.last().copied().unwrap()
 }
 
-fn fill_values_and_nodes<'a>(
-    node: &'a Option<Box<node::Node>>,
-    insert_row: usize,
-    values: &mut Vec<Vec<Option<i32>>>,
-    nodes: &mut Vec<Option<&'a node::Node>>,
-) {
-    match node.as_ref() {
-        Some(n) => {
-            values[insert_row].push(Some(n.value));
-            nodes.push(Some(&n));
+fn get_next_iter_nodes<'a>(nodes: Vec<Option<&'a node::Node>>) -> Vec<Option<&'a node::Node>> {
+    let mut tmp_nodes: Vec<Option<&node::Node>> = vec![];
+    for n in nodes.iter() {
+        match n {
+            Some(n) => {
+                match n.left.as_ref() {
+                    Some(n) => tmp_nodes.push(Some(&n)),
+                    None => tmp_nodes.push(None),
+                };
+                match n.right.as_ref() {
+                    Some(n) => tmp_nodes.push(Some(&n)),
+                    None => tmp_nodes.push(None),
+                };
+            }
+            None => {
+                tmp_nodes.push(None);
+                tmp_nodes.push(None);
+            }
         }
-        None => {
-            values[insert_row].push(None);
-            nodes.push(None);
-        }
-    };
+    }
+    tmp_nodes
 }
 
 fn is_some_in_vec(v: &Vec<Option<&node::Node>>) -> bool {
@@ -156,13 +161,13 @@ fn is_some_in_vec(v: &Vec<Option<&node::Node>>) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    //
     #[test]
     fn padding_for_one() {
         let n = node::Node::new(1);
         assert_eq!(calc_padding(&n), 3);
     }
-
+    //
     #[test]
     fn padding_for_three() {
         let mut n = node::Node::new(1);
@@ -170,7 +175,7 @@ mod tests {
         n.add_node(3);
         assert_eq!(calc_padding(&n), 15);
     }
-
+    //
     #[test]
     fn padding_for_five() {
         let mut n = node::Node::new(1);
@@ -180,7 +185,7 @@ mod tests {
         n.add_node(5);
         assert_eq!(calc_padding(&n), 63);
     }
-
+    //
     #[test]
     fn single_node_tree() {
         let root = Box::new(node::Node::new(1));
@@ -230,32 +235,26 @@ mod tests {
 
     #[test]
     fn should_add_some() {
-        let node = Option::from(Box::new(node::Node::new(3)));
-        let insert_row = 0;
-        let mut values = vec![vec![]];
-        let mut nodes = vec![];
+        let mut node = node::Node::new(2);
+        node.add_node(1);
 
-        fill_values_and_nodes(&node, insert_row, &mut values, &mut nodes);
+        let mut nodes = vec![Option::from(&node)];
 
-        let expected_values = vec![vec![Some(3)]];
-        let tmp = node.as_ref().unwrap().as_ref();
-        let expected_nodes = vec![Some(tmp)];
-        assert_eq!(values, expected_values);
+        nodes = get_next_iter_nodes(nodes);
+
+        let exp_node = node::Node::new(1);
+        let expected_nodes = vec![Option::from(&exp_node), None];
         assert_eq!(nodes, expected_nodes);
     }
 
     #[test]
     fn should_add_none() {
         let node = None;
-        let insert_row = 0;
-        let mut values = vec![vec![]];
-        let mut nodes = vec![];
+        let mut nodes = vec![node];
 
-        fill_values_and_nodes(&node, insert_row, &mut values, &mut nodes);
+        nodes = get_next_iter_nodes(nodes);
 
-        let expected_values = vec![vec![None]];
-        let expected_nodes = vec![None];
-        assert_eq!(values, expected_values);
+        let expected_nodes = vec![None, None];
         assert_eq!(nodes, expected_nodes);
     }
 }
