@@ -54,43 +54,23 @@ impl Sandbox for Tree {
                 ),
         );
 
-        // Print the tree
-
-        let depth = format!("Current depth is {}", self.root.get_depth());
-        view = view.push(
+        let curr_depth = format!("Current depth is {}", self.root.get_depth());
+        view.push(
             Row::new()
                 .align_items(Alignment::Center)
-                .push(Text::new(depth.to_string()).size(50)),
-        );
-        let printable_nodes = print_tree(&self.root);
-
-        // for nodes in printable_nodes {
-        //     let mut tree_layer = Row::new().padding(20);
-        //     for n in nodes {
-        //         match n {
-        //             Some(n) => tree_layer = tree_layer.push(Text::new(n.to_string()).size(25)),
-        //             None => tree_layer = tree_layer.push(Text::new("leaf".to_string()).size(25)),
-        //         }
-        //     }
-        //     view = view.push(Column::new().push(tree_layer));
-        // }
-        // Finish printing the tree
-
-        view.into()
+                .push(Text::new(curr_depth.to_string()).size(50)),
+        )
+        .push(print_tree(&self.root))
+        .into()
     }
 }
 
-fn print_tree(node: &node::Node) {
+fn print_tree(node: &node::Node) -> Column<Message> {
     let mut nodes = vec![Some(node)];
-
     let mut ret: Column<Message> = Column::new().push(Row::new().padding(15));
-
-    // let factor = 2;
-
     let mut depth = node.get_depth();
 
     loop {
-        // here do magic
         for node in nodes.iter() {
             // let mut tree_layer: Row<Message> = Row::new().padding(20);
             match node {
@@ -111,13 +91,12 @@ fn print_tree(node: &node::Node) {
             }
         }
         depth -= 1;
-        // here stop doing magic
-
         if !is_some_in_vec(&nodes) {
             break;
         }
         nodes = get_next_iter_nodes(nodes);
     }
+    ret
 }
 
 fn calc_padding(depth: &u32) -> u16 {
@@ -161,31 +140,25 @@ fn is_some_in_vec(v: &Vec<Option<&node::Node>>) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    //
+
     #[test]
     fn padding_for_one() {
-        let n = node::Node::new(1);
-        assert_eq!(calc_padding(&n), 3);
+        let depth = 1;
+        assert_eq!(calc_padding(&depth), 3);
     }
-    //
+
     #[test]
     fn padding_for_three() {
-        let mut n = node::Node::new(1);
-        n.add_node(2);
-        n.add_node(3);
-        assert_eq!(calc_padding(&n), 15);
+        let depth = 3;
+        assert_eq!(calc_padding(&depth), 15);
     }
-    //
+
     #[test]
     fn padding_for_five() {
-        let mut n = node::Node::new(1);
-        n.add_node(2);
-        n.add_node(3);
-        n.add_node(4);
-        n.add_node(5);
-        assert_eq!(calc_padding(&n), 63);
+        let depth = 5;
+        assert_eq!(calc_padding(&depth), 63);
     }
-    //
+
     #[test]
     fn single_node_tree() {
         let root = Box::new(node::Node::new(1));
