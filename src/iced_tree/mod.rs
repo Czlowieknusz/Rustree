@@ -1,4 +1,4 @@
-use iced::{button, Alignment, Button, Column, Element, Renderer, Row, Sandbox, Text};
+use iced::{button, Alignment, Button, Column, Element, Row, Sandbox, Text};
 use rand::Rng;
 
 pub mod node;
@@ -40,28 +40,28 @@ impl Sandbox for Tree {
     }
 
     fn view(&mut self) -> Element<Message> {
-        let mut view = Column::new().push(
-            Row::new()
-                .padding(20)
-                .align_items(Alignment::Center)
-                .push(
-                    Button::new(&mut self.add_child_btn, Text::new("AddChild"))
-                        .on_press(Message::AddChild),
-                )
-                .push(
-                    Button::new(&mut self.del_child_btn, Text::new("DelChild"))
-                        .on_press(Message::DelChild),
-                ),
-        );
-
         let curr_depth = format!("Current depth is {}", self.root.get_depth());
-        view.push(
-            Row::new()
-                .align_items(Alignment::Center)
-                .push(Text::new(curr_depth.to_string()).size(50)),
-        )
-        .push(print_tree(&self.root))
-        .into()
+        Column::new()
+            .push(
+                Row::new()
+                    .padding(20)
+                    .align_items(Alignment::Center)
+                    .push(
+                        Button::new(&mut self.add_child_btn, Text::new("AddChild"))
+                            .on_press(Message::AddChild),
+                    )
+                    .push(
+                        Button::new(&mut self.del_child_btn, Text::new("DelChild"))
+                            .on_press(Message::DelChild),
+                    ),
+            )
+            .push(
+                Row::new()
+                    .align_items(Alignment::Center)
+                    .push(Text::new(curr_depth.to_string()).size(50)),
+            )
+            .push(print_tree(&self.root))
+            .into()
     }
 }
 
@@ -69,27 +69,29 @@ fn print_tree(node: &node::Node) -> Column<Message> {
     let mut nodes = vec![Some(node)];
     let mut ret: Column<Message> = Column::new().push(Row::new().padding(15));
     let mut depth = node.get_depth();
+    let dst_coeficient = 3;
 
     loop {
+        let mut tree_layer: Row<Message> = Row::new();
         for node in nodes.iter() {
-            // let mut tree_layer: Row<Message> = Row::new().padding(20);
             match node {
                 Some(node) => {
-                    ret = ret.push(
+                    tree_layer = tree_layer.push(
                         Column::new()
                             .push(Text::new(node.value.to_string()).size(25))
-                            .padding(calc_padding(&depth)),
+                            .padding(calc_padding(&depth) * dst_coeficient),
                     )
                 }
                 None => {
-                    ret = ret.push(
+                    tree_layer = tree_layer.push(
                         Column::new()
                             .push(Text::new("*".to_string()).size(25))
-                            .padding(calc_padding(&depth)),
+                            .padding(calc_padding(&depth) * dst_coeficient),
                     )
                 }
             }
         }
+        ret = ret.push(tree_layer);
         if !is_some_in_vec(&nodes) {
             break;
         }
