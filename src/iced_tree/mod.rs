@@ -1,4 +1,4 @@
-use iced::{button, Alignment, Button, Column, Element, Row, Sandbox, Text};
+use iced::{button, Alignment, Button, Column, Element, Renderer, Row, Sandbox, Text};
 use rand::Rng;
 
 pub mod node;
@@ -64,66 +64,66 @@ impl Sandbox for Tree {
         );
         let printable_nodes = print_tree(&self.root);
 
-        for nodes in printable_nodes {
-            let mut tree_layer = Row::new().padding(20);
-            for n in nodes {
-                match n {
-                    Some(n) => tree_layer = tree_layer.push(Text::new(n.to_string()).size(25)),
-                    None => tree_layer = tree_layer.push(Text::new("leaf".to_string()).size(25)),
-                }
-            }
-            view = view.push(Column::new().push(tree_layer));
-        }
+        // for nodes in printable_nodes {
+        //     let mut tree_layer = Row::new().padding(20);
+        //     for n in nodes {
+        //         match n {
+        //             Some(n) => tree_layer = tree_layer.push(Text::new(n.to_string()).size(25)),
+        //             None => tree_layer = tree_layer.push(Text::new("leaf".to_string()).size(25)),
+        //         }
+        //     }
+        //     view = view.push(Column::new().push(tree_layer));
+        // }
         // Finish printing the tree
 
         view.into()
     }
 }
 
-fn print_tree(node: &node::Node) -> Vec<Vec<Option<i32>>> {
-    let mut values = vec![vec![Some(node.value)]];
-
+fn print_tree(node: &node::Node) {
     let mut nodes = vec![Some(node)];
 
-    // let mut ret_val = Column::new().push(Row::new().padding(15));
+    let mut ret: Column<Message> = Column::new().push(Row::new().padding(15));
 
-    // loop {
-    //     nodes = get_next_iter_nodes(nodes);
-    // }
+    // let factor = 2;
 
-    // loop {
-    //     let insert_row = values.len();
-    //     values.push(vec![]);
-    //     let mut tmp_nodes: Vec<Option<&node::Node>> = vec![];
-    //     for node in nodes.iter() {
-    //         match node {
-    //             Some(node) => {
-    //                 fill_values_and_nodes(&node.left, insert_row, &mut values, &mut tmp_nodes);
-    //                 fill_values_and_nodes(&node.right, insert_row, &mut values, &mut tmp_nodes);
-    //             }
-    //             None => {
-    //                 values[insert_row].push(None);
-    //                 values[insert_row].push(None);
-    //                 tmp_nodes.push(None);
-    //                 tmp_nodes.push(None);
-    //             }
-    //         }
-    //     }
+    let mut depth = node.get_depth();
 
-    //     if !is_some_in_vec(&tmp_nodes) {
-    //         break;
-    //     }
-    //     nodes = tmp_nodes;
-    // }
+    loop {
+        // here do magic
+        for node in nodes.iter() {
+            // let mut tree_layer: Row<Message> = Row::new().padding(20);
+            match node {
+                Some(node) => {
+                    ret = ret.push(
+                        Column::new()
+                            .push(Text::new(node.value.to_string()).size(25))
+                            .padding(calc_padding(&depth)),
+                    )
+                }
+                None => {
+                    ret = ret.push(
+                        Column::new()
+                            .push(Text::new("*".to_string()).size(25))
+                            .padding(calc_padding(&depth)),
+                    )
+                }
+            }
+        }
+        depth -= 1;
+        // here stop doing magic
 
-    values
+        if !is_some_in_vec(&nodes) {
+            break;
+        }
+        nodes = get_next_iter_nodes(nodes);
+    }
 }
 
-fn calc_padding(n: &node::Node) -> i32 {
+fn calc_padding(depth: &u32) -> u16 {
     let mut paddings = vec![1];
-    let d = n.get_depth() as usize;
-    for i in 0..d {
-        paddings.push(paddings[i] * 2 + 1);
+    for i in 0..*depth {
+        paddings.push(paddings[i as usize] * 2 + 1);
     }
     paddings.last().copied().unwrap()
 }
