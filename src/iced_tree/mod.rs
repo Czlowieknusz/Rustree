@@ -74,19 +74,22 @@ fn print_tree(node: &node::Node) -> Column<Message> {
     loop {
         let mut tree_layer: Row<Message> = Row::new();
         for node in nodes.iter() {
+            let padding = calc_padding(&depth) * dst_coeficient;
             match node {
                 Some(node) => {
                     tree_layer = tree_layer.push(
                         Column::new()
                             .push(Text::new(node.value.to_string()).size(25))
-                            .padding(calc_padding(&depth) * dst_coeficient),
+                            .padding(padding)
+                            .align_items(Alignment::Center),
                     )
                 }
                 None => {
                     tree_layer = tree_layer.push(
                         Column::new()
                             .push(Text::new("*".to_string()).size(25))
-                            .padding(calc_padding(&depth) * dst_coeficient),
+                            .padding(padding)
+                            .align_items(Alignment::Center),
                     )
                 }
             }
