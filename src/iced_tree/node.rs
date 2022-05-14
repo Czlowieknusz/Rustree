@@ -33,6 +33,10 @@ impl Node {
         }
     }
 
+    pub fn del_node(&mut self, value: i32) {}
+
+    fn balance_tree() {}
+
     pub fn new(value: i32) -> Node {
         Node {
             value,
@@ -83,5 +87,25 @@ mod tests {
         }
 
         assert_eq!(root.get_depth(), 100);
+    }
+
+    #[test]
+    fn tree_should_connect_on_middle_node_deleted() {
+        let mut root = Box::new(Node::new(0));
+        root.add_node(1);
+        root.add_node(2);
+        assert_eq!(root.get_depth(), 3);
+
+        root.del_node(1);
+        assert_eq!(root.get_depth(), 2);
+    }
+
+    #[test]
+    fn should_delete_root() {
+        let mut root = Box::new(Node::new(0));
+        assert_eq!(root.get_depth(), 1);
+
+        root.del_node(0);
+        assert_eq!(root.get_depth(), 0);
     }
 }
