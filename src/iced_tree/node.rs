@@ -1,5 +1,7 @@
 use std::cmp;
 
+use queues::*;
+
 #[derive(Debug, Default, PartialEq)]
 pub struct Node {
     pub value: i32,
@@ -33,9 +35,30 @@ impl Node {
         }
     }
 
-    pub fn del_node(&mut self, _value: i32) {}
+    pub fn del_node(&mut self, value: i32) {
+        self.find_node(value);
+    }
 
-    fn balance_tree() {}
+    pub fn find_node(&self, value: i32) -> Option<&Node> {
+        let mut nodes: Queue<Option<&Node>> = queue![];
+        nodes.add(Some(self)).ok()?;
+        while nodes.size() > 0 {
+            if let Some(&n) = nodes.remove().unwrap().as_ref() {
+                if n.value == value {
+                    return Some(n);
+                }
+                if let Some(n) = n.left.as_ref() {
+                    nodes.add(Some(n)).ok()?;
+                }
+                if let Some(n) = n.right.as_ref() {
+                    nodes.add(Some(n)).ok()?;
+                }
+            }
+        }
+        None
+    }
+
+    // fn balance_tree() {}
 
     pub fn new(value: i32) -> Node {
         Node {
@@ -107,5 +130,33 @@ mod tests {
 
         root.del_node(0);
         assert_eq!(root.get_depth(), 0);
+    }
+
+    #[test]
+    fn find_value_in_single_element_tree() {
+        let root = Box::new(Node::new(3));
+        assert_eq!(root.find_node(3).unwrap(), root.as_ref());
+    }
+
+    #[test]
+    fn find_value_in_multi_elements_tree() {
+        let mut root = Box::new(Node::new(5));
+        for i in 0..9 {
+            root.add_node(i);
+        }
+        assert_eq!(root.get_depth(), 6);
+        assert_eq!(
+            root.find_node(6).unwrap(),
+            root.right.as_ref().unwrap().as_ref()
+        );
+    }
+
+    #[test]
+    fn retrun_none_if_value_not_present() {
+        let mut root = Box::new(Node::new(5));
+        for i in 0..9 {
+            root.add_node(i);
+        }
+        assert_eq!(root.find_node(12), None);
     }
 }

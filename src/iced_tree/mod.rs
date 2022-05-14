@@ -31,10 +31,15 @@ impl Sandbox for Tree {
         match message {
             Message::AddChild => {
                 let mut rng = rand::thread_rng();
-                self.root.add_node(rng.gen::<i32>() % 10);
+                let val = rng.gen::<i32>() % 10;
+                println!("Trying to add {}.", val);
+                self.root.add_node(val);
             }
             Message::DelChild => {
-                println!("Not implemented yet!");
+                let mut rng = rand::thread_rng();
+                let val = rng.gen::<i32>() % 10;
+                println!("Trying to delete {}.", val);
+                self.root.del_node(val);
             }
         }
     }
