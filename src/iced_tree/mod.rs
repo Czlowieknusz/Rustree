@@ -58,7 +58,7 @@ impl Sandbox for Tree {
             .push(
                 Row::new()
                     .align_items(Alignment::Center)
-                    .push(Text::new(curr_depth.to_string()).size(50)),
+                    .push(Text::new(curr_depth).size(50)),
             )
             .push(print_tree(&self.root))
             .into()
@@ -112,17 +112,17 @@ fn calc_padding(depth: &u32) -> u16 {
     paddings.last().copied().unwrap()
 }
 
-fn get_next_iter_nodes<'a>(nodes: Vec<Option<&'a node::Node>>) -> Vec<Option<&'a node::Node>> {
+fn get_next_iter_nodes(nodes: Vec<Option<&node::Node>>) -> Vec<Option<&node::Node>> {
     let mut tmp_nodes: Vec<Option<&node::Node>> = vec![];
     for n in nodes.iter() {
         match n {
             Some(n) => {
                 match n.left.as_ref() {
-                    Some(n) => tmp_nodes.push(Some(&n)),
+                    Some(n) => tmp_nodes.push(Some(n)),
                     None => tmp_nodes.push(None),
                 };
                 match n.right.as_ref() {
-                    Some(n) => tmp_nodes.push(Some(&n)),
+                    Some(n) => tmp_nodes.push(Some(n)),
                     None => tmp_nodes.push(None),
                 };
             }
@@ -135,11 +135,8 @@ fn get_next_iter_nodes<'a>(nodes: Vec<Option<&'a node::Node>>) -> Vec<Option<&'a
     tmp_nodes
 }
 
-fn is_some_in_vec(v: &Vec<Option<&node::Node>>) -> bool {
-    v.iter().any(|&n| match n {
-        Some(_) => true,
-        None => false,
-    })
+fn is_some_in_vec(v: &[Option<&node::Node>]) -> bool {
+    v.iter().any(|&n| n.is_some())
 }
 
 #[cfg(test)]

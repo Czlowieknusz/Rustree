@@ -27,13 +27,13 @@ impl Node {
         } else {
             &mut self.left
         };
-        match subtree_root_node {
-            &mut Some(ref mut subtree_root_node) => subtree_root_node.add_node(value),
-            &mut None => *subtree_root_node = Option::from(Box::new(Node::new(value))),
+        match *subtree_root_node {
+            Some(ref mut subtree_root_node) => subtree_root_node.add_node(value),
+            None => *subtree_root_node = Option::from(Box::new(Node::new(value))),
         }
     }
 
-    pub fn del_node(&mut self, value: i32) {}
+    pub fn del_node(&mut self, _value: i32) {}
 
     fn balance_tree() {}
 
