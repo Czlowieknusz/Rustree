@@ -1,5 +1,5 @@
 [package]
-name = "tree"
+name = "rustree"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,3 +9,4 @@ edition = "2021"
 iced = "0.4"
 rand = "0.8.5"
 queues = "1.1.0"
+binary_search_tree = "0.2.2"

@@ -9,6 +9,13 @@ pub struct Node {
     pub right: Option<Box<Node>>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Successor<'a> {
+    LeftNode(&'a Node),
+    RightNode(&'a Node),
+    None,
+}
+
 impl Node {
     pub fn get_depth(&self) -> u32 {
         match (self.left.as_ref(), self.right.as_ref()) {
@@ -35,8 +42,40 @@ impl Node {
         }
     }
 
-    pub fn del_node(&mut self, value: i32) {
-        self.find_node(value);
+    pub fn del_node(&mut self, value: i32) /* -> Option<&Node> */
+    {
+        // find node for deletion
+        let mut n_for_del = self.find_node(value);
+        if n_for_del.is_none() {
+            println!("Node with {} does not exist", value);
+            return;
+        }
+        let succ_parent = n_for_del.unwrap().find_successor_parent();
+    }
+
+    fn find_successor_parent(&self) -> Successor {
+        if self.right.is_none() {
+            if self.left.is_none() {
+                return Successor::None; // single node tree
+            }
+            return Successor::LeftNode(self); // replece deleted node with left node
+        }
+        if self.left.is_none() {
+            return Successor::RightNode(self); // replece deleted node with right node
+        }
+        if self.right.as_ref().unwrap().as_ref().left.is_none() {
+            return Successor::RightNode(self.right.as_ref().unwrap());
+        }
+        let mut buff = Buffer::new(1);
+        buff.add(&self.right).ok();
+        loop {
+            let succ = buff.remove().unwrap().as_ref().unwrap().as_ref();
+            let left: &Option<Box<Node>> = &succ.left;
+            if left.as_ref().unwrap().left.is_none() {
+                return Successor::LeftNode(succ);
+            }
+            buff.add(left).ok();
+        }
     }
 
     pub fn find_node(&self, value: i32) -> Option<&Node> {
@@ -57,8 +96,6 @@ impl Node {
         }
         None
     }
-
-    // fn balance_tree() {}
 
     pub fn new(value: i32) -> Node {
         Node {
@@ -152,11 +189,74 @@ mod tests {
     }
 
     #[test]
-    fn retrun_none_if_value_not_present() {
+    fn return_none_if_value_not_present() {
         let mut root = Box::new(Node::new(5));
         for i in 0..9 {
             root.add_node(i);
         }
         assert_eq!(root.find_node(12), None);
+    }
+
+    #[test]
+    fn find_none_in_single_node_tree() {
+        let root = Box::new(Node::new(5));
+        assert_eq!(root.find_successor_parent(), Successor::None);
+    }
+
+    #[test]
+    fn find_successor_parent_two_subtrees() {
+        let root = prepare_tree();
+        if let Successor::LeftNode(succ_parent) = root.find_successor_parent() {
+            assert_eq!(succ_parent.value, 7);
+        } else {
+            panic!("Wrong node chosen as successor!");
+        }
+    }
+
+    #[test]
+    fn find_successor_parent_with_only_left_subtree() {
+        let mut root = Box::new(Node::new(5));
+        root.add_node(3);
+        if let Successor::LeftNode(succ_parent) = root.find_successor_parent() {
+            assert_eq!(succ_parent.value, 5);
+        } else {
+            panic!("Wrong node chosen as successor!");
+        }
+    }
+
+    #[test]
+    fn right_node_has_no_left_child() {
+        let mut root = Box::new(Node::new(5));
+        root.add_node(6);
+        if let Successor::RightNode(succ_parent) = root.find_successor_parent() {
+            assert_eq!(succ_parent.value, 5);
+        } else {
+            panic!("Wrong node chosen as successor!");
+        }
+    }
+
+    fn prepare_tree() -> Box<Node> {
+        /*
+                5
+             /     \
+           2        7
+         /  \      /  \
+        0    4    6    8
+        \   /           \
+         1 3             9
+        */
+        let mut root = Box::new(Node::new(5));
+        // left
+        root.add_node(2);
+        root.add_node(0);
+        root.add_node(4);
+        root.add_node(1);
+        root.add_node(3);
+        // right
+        root.add_node(7);
+        root.add_node(6);
+        root.add_node(8);
+        root.add_node(9);
+        root
     }
 }
