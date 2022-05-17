@@ -5,7 +5,7 @@ pub mod node;
 
 #[derive(Default)]
 pub struct Tree {
-    root: Box<node::Node>,
+    root: Box<node::Tree>,
     add_child_btn: button::State,
     del_child_btn: button::State,
 }
@@ -65,12 +65,12 @@ impl Sandbox for Tree {
                     .align_items(Alignment::Center)
                     .push(Text::new(curr_depth).size(50)),
             )
-            .push(print_tree(&self.root))
+            .push(print_tree(self.root.as_ref()))
             .into()
     }
 }
 
-fn print_tree(node: &node::Node) -> Column<Message> {
+fn print_tree(node: &node::Tree) -> Column<Message> {
     let mut nodes = vec![Some(node)];
     let mut ret: Column<Message> = Column::new().push(Row::new().padding(15));
     let mut depth = node.get_depth();
@@ -84,7 +84,7 @@ fn print_tree(node: &node::Node) -> Column<Message> {
                 Some(node) => {
                     tree_layer = tree_layer.push(
                         Column::new()
-                            .push(Text::new(node.value.to_string()).size(25))
+                            .push(Text::new(node.0.as_ref().unwrap().value.to_string()).size(25))
                             .padding(padding)
                             .align_items(Alignment::Center),
                     )
@@ -117,17 +117,17 @@ fn calc_padding(depth: &u32) -> u16 {
     paddings.last().copied().unwrap()
 }
 
-fn get_next_iter_nodes(nodes: Vec<Option<&node::Node>>) -> Vec<Option<&node::Node>> {
-    let mut tmp_nodes: Vec<Option<&node::Node>> = vec![];
+fn get_next_iter_nodes(nodes: Vec<Option<&node::Tree>>) -> Vec<Option<&node::Tree>> {
+    let mut tmp_nodes: Vec<Option<&node::Tree>> = vec![];
     for n in nodes.iter() {
         match n {
             Some(n) => {
-                match n.left.0.as_ref() {
-                    Some(n) => tmp_nodes.push(Some(n)),
+                match n.0.as_ref().unwrap().left.0 {
+                    Some(_) => tmp_nodes.push(Some(&n.0.as_ref().unwrap().left)),
                     None => tmp_nodes.push(None),
                 };
-                match n.right.0.as_ref() {
-                    Some(n) => tmp_nodes.push(Some(n)),
+                match n.0.as_ref().unwrap().right.0 {
+                    Some(_) => tmp_nodes.push(Some(&n.0.as_ref().unwrap().right)),
                     None => tmp_nodes.push(None),
                 };
             }
@@ -140,7 +140,7 @@ fn get_next_iter_nodes(nodes: Vec<Option<&node::Node>>) -> Vec<Option<&node::Nod
     tmp_nodes
 }
 
-fn is_some_in_vec(v: &[Option<&node::Node>]) -> bool {
+fn is_some_in_vec(v: &[Option<&node::Tree>]) -> bool {
     v.iter().any(|&n| n.is_some())
 }
 
@@ -168,7 +168,7 @@ mod tests {
 
     #[test]
     fn one_some() {
-        let n = node::Node::new(3);
+        let n = node::Tree::new(3);
         let v = vec![None, None, Some(&n)];
         assert_eq!(is_some_in_vec(&v), true);
     }
@@ -182,8 +182,8 @@ mod tests {
 
     #[test]
     fn all_some() {
-        let n1 = node::Node::new(2);
-        let n2 = node::Node::new(3);
+        let n1 = node::Tree::new(2);
+        let n2 = node::Tree::new(3);
         let v = vec![Some(&n1), Some(&n2)];
 
         assert_eq!(is_some_in_vec(&v), true);
@@ -191,14 +191,14 @@ mod tests {
 
     #[test]
     fn should_add_some() {
-        let mut node = node::Node::new(2);
+        let mut node = node::Tree::new(2);
         node.add_node(1);
 
         let mut nodes = vec![Option::from(&node)];
 
         nodes = get_next_iter_nodes(nodes);
 
-        let exp_node = node::Node::new(1);
+        let exp_node = node::Tree::new(1);
         let expected_nodes = vec![Option::from(&exp_node), None];
         assert_eq!(nodes, expected_nodes);
     }
