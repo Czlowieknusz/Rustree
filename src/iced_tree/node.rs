@@ -114,36 +114,46 @@ impl Tree {
         Tree(Some(Box::new(Node::new(val))))
     }
 
-    pub fn del_node(&mut self, value: i32) -> Option<Node> {
+    pub fn del_node(&mut self, value: i32) -> bool {
         let mut current: *mut Tree = self;
 
         unsafe {
             while let Some(ref mut node) = (*current).0 {
                 if node.value == value {
-                    // return Some(n);
+                    match (node.left.0.as_mut(), node.right.0.as_mut()) {
+                        (None, None) => (*current).0 = None,
+                        (None, Some(_)) => (*current).0 = node.right.0.take(),
+                        (Some(_), None) => (*current).0 = node.left.0.take(),
+                        (Some(_), Some(_)) => {
+                            (*current).0.as_mut().unwrap().value = node.right.extract_min();
+                            return true;
+                        }
+                    }
                 }
                 if node.value > value {
                     current = &mut node.left;
                 }
-                if node.value < value {}
+                if node.value < value {
+                    current = &mut node.right;
+                }
             }
         }
-        // let mut nodes: Queue<&Tree> = queue![];
-        // nodes.add(self).ok()?;
-        // while nodes.size() > 0 {
-        //     if let Some(&n) = nodes.remove().unwrap().as_ref() {
-        //         if n.value == value {
-        //             return Some(n);
-        //         }
-        //         if let Some(n) = n.left.as_ref() {
-        //             nodes.add(Some(n)).ok()?;
-        //         }
-        //         if let Some(n) = n.right.as_ref() {
-        //             nodes.add(Some(n)).ok()?;
-        //         }
-        //     }
-        // }
-        None
+        false
+    }
+
+    unsafe fn extract_min(&mut self) -> i32 {
+        let mut current: *mut Tree = self;
+
+        if self.0.is_none() {
+            panic!("Called extract_min on Tree without Node. This should never happen!");
+        }
+
+        while (*current).0.as_ref().unwrap().left.0.is_some() {
+            current = &mut (*current).0.as_mut().unwrap().left;
+        }
+        let deleted_node = (*current).0.take().unwrap();
+        (*current).0 = deleted_node.right.0;
+        deleted_node.value
     }
 }
 
