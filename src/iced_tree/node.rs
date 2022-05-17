@@ -20,22 +20,6 @@ enum Successor<'a> {
 }
 
 impl Node {
-    pub fn add_node(&mut self, value: i32) {
-        if self.value == value {
-            println!("Value {} already present!", value);
-            return;
-        }
-        let subtree_root_node = if value > self.value {
-            &mut self.right
-        } else {
-            &mut self.left
-        };
-        match subtree_root_node.0 {
-            Some(ref mut subtree_root_node) => subtree_root_node.add_node(value),
-            None => subtree_root_node.0 = Option::from(Box::new(Node::new(value))),
-        }
-    }
-
     pub fn new(value: i32) -> Node {
         Node {
             value,
@@ -46,6 +30,22 @@ impl Node {
 }
 
 impl Tree {
+    pub fn add_node(&mut self, value: i32) {
+        if self.0.as_ref().unwrap().value == value {
+            println!("Value {} already present!", value);
+            return;
+        }
+        let subtree_root_node = if value > self.0.as_ref().unwrap().value {
+            &mut self.0.as_mut().unwrap().right
+        } else {
+            &mut self.0.as_mut().unwrap().left
+        };
+        match subtree_root_node.0 {
+            Some(_) => subtree_root_node.add_node(value),
+            None => subtree_root_node.0 = Option::from(Box::new(Node::new(value))),
+        }
+    }
+
     pub fn get_depth(&self) -> u32 {
         if self.0.is_none() {
             return 0;
