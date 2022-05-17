@@ -45,61 +45,6 @@ impl Node {
         }
     }
 
-    pub fn del_node(&mut self, value: i32) /* -> Option<&Node> */
-    {
-        // find node for deletion
-        let mut n_for_del = self.find_node(value);
-        if n_for_del.is_none() {
-            println!("Node with {} does not exist", value);
-            return;
-        }
-        let succ_parent = n_for_del.unwrap().find_successor_parent();
-    }
-
-    fn find_successor_parent(&self) -> Successor {
-        if self.right.0.is_none() {
-            if self.left.0.is_none() {
-                return Successor::None; // single node tree
-            }
-            return Successor::LeftNode(self); // replece deleted node with left node
-        }
-        if self.left.0.is_none() {
-            return Successor::RightNode(self); // replece deleted node with right node
-        }
-        if self.right.0.as_ref().unwrap().as_ref().left.0.is_none() {
-            return Successor::RightNode(self.right.0.as_ref().unwrap());
-        }
-        let mut buff = Buffer::new(1);
-        buff.add(&self.right).ok();
-        loop {
-            let succ = buff.remove().unwrap().0.as_ref().unwrap().as_ref();
-            let left = &succ.left;
-            if left.0.as_ref().unwrap().left.0.is_none() {
-                return Successor::LeftNode(succ);
-            }
-            buff.add(left).ok();
-        }
-    }
-
-    pub fn find_node(&self, value: i32) -> Option<&Node> {
-        let mut nodes: Queue<Option<&Node>> = queue![];
-        nodes.add(Some(self)).ok()?;
-        while nodes.size() > 0 {
-            if let Some(&n) = nodes.remove().unwrap().as_ref() {
-                if n.value == value {
-                    return Some(n);
-                }
-                if let Some(n) = n.left.0.as_ref() {
-                    nodes.add(Some(n)).ok()?;
-                }
-                if let Some(n) = n.right.0.as_ref() {
-                    nodes.add(Some(n)).ok()?;
-                }
-            }
-        }
-        None
-    }
-
     pub fn new(value: i32) -> Node {
         Node {
             value,
