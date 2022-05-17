@@ -5,9 +5,12 @@ use queues::*;
 #[derive(Debug, Default, PartialEq)]
 pub struct Node {
     pub value: i32,
-    pub left: Option<Box<Node>>,
-    pub right: Option<Box<Node>>,
+    pub left: Tree,
+    pub right: Tree,
 }
+
+#[derive(Debug, Default, PartialEq)]
+pub struct Tree(pub Option<Box<Node>>);
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Successor<'a> {
@@ -18,7 +21,7 @@ enum Successor<'a> {
 
 impl Node {
     pub fn get_depth(&self) -> u32 {
-        match (self.left.as_ref(), self.right.as_ref()) {
+        match (self.left.0.as_ref(), self.right.0.as_ref()) {
             (None, None) => 1,
             (Some(left), None) => left.get_depth() + 1,
             (None, Some(right)) => right.get_depth() + 1,
@@ -36,9 +39,9 @@ impl Node {
         } else {
             &mut self.left
         };
-        match *subtree_root_node {
+        match subtree_root_node.0 {
             Some(ref mut subtree_root_node) => subtree_root_node.add_node(value),
-            None => *subtree_root_node = Option::from(Box::new(Node::new(value))),
+            None => subtree_root_node.0 = Option::from(Box::new(Node::new(value))),
         }
     }
 
@@ -54,24 +57,24 @@ impl Node {
     }
 
     fn find_successor_parent(&self) -> Successor {
-        if self.right.is_none() {
-            if self.left.is_none() {
+        if self.right.0.is_none() {
+            if self.left.0.is_none() {
                 return Successor::None; // single node tree
             }
             return Successor::LeftNode(self); // replece deleted node with left node
         }
-        if self.left.is_none() {
+        if self.left.0.is_none() {
             return Successor::RightNode(self); // replece deleted node with right node
         }
-        if self.right.as_ref().unwrap().as_ref().left.is_none() {
-            return Successor::RightNode(self.right.as_ref().unwrap());
+        if self.right.0.as_ref().unwrap().as_ref().left.0.is_none() {
+            return Successor::RightNode(self.right.0.as_ref().unwrap());
         }
         let mut buff = Buffer::new(1);
         buff.add(&self.right).ok();
         loop {
-            let succ = buff.remove().unwrap().as_ref().unwrap().as_ref();
-            let left: &Option<Box<Node>> = &succ.left;
-            if left.as_ref().unwrap().left.is_none() {
+            let succ = buff.remove().unwrap().0.as_ref().unwrap().as_ref();
+            let left = &succ.left;
+            if left.0.as_ref().unwrap().left.0.is_none() {
                 return Successor::LeftNode(succ);
             }
             buff.add(left).ok();
@@ -86,10 +89,10 @@ impl Node {
                 if n.value == value {
                     return Some(n);
                 }
-                if let Some(n) = n.left.as_ref() {
+                if let Some(n) = n.left.0.as_ref() {
                     nodes.add(Some(n)).ok()?;
                 }
-                if let Some(n) = n.right.as_ref() {
+                if let Some(n) = n.right.0.as_ref() {
                     nodes.add(Some(n)).ok()?;
                 }
             }
@@ -100,9 +103,47 @@ impl Node {
     pub fn new(value: i32) -> Node {
         Node {
             value,
-            left: None,
-            right: None,
+            left: Tree(None),
+            right: Tree(None),
         }
+    }
+}
+
+impl Tree {
+    fn new(val: i32) -> Tree {
+        Tree(Some(Box::new(Node::new(val))))
+    }
+
+    pub fn del_node(&mut self, value: i32) -> Option<Node> {
+        let mut current: *mut Tree = self;
+
+        unsafe {
+            while let Some(ref mut node) = (*current).0 {
+                if node.value == value {
+                    // return Some(n);
+                }
+                if node.value > value {
+                    current = &mut node.left;
+                }
+                if node.value < value {}
+            }
+        }
+        // let mut nodes: Queue<&Tree> = queue![];
+        // nodes.add(self).ok()?;
+        // while nodes.size() > 0 {
+        //     if let Some(&n) = nodes.remove().unwrap().as_ref() {
+        //         if n.value == value {
+        //             return Some(n);
+        //         }
+        //         if let Some(n) = n.left.as_ref() {
+        //             nodes.add(Some(n)).ok()?;
+        //         }
+        //         if let Some(n) = n.right.as_ref() {
+        //             nodes.add(Some(n)).ok()?;
+        //         }
+        //     }
+        // }
+        None
     }
 }
 
@@ -184,7 +225,7 @@ mod tests {
         assert_eq!(root.get_depth(), 6);
         assert_eq!(
             root.find_node(6).unwrap(),
-            root.right.as_ref().unwrap().as_ref()
+            root.right.0.as_ref().unwrap().as_ref()
         );
     }
 

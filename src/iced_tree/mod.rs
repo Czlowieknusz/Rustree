@@ -122,11 +122,11 @@ fn get_next_iter_nodes(nodes: Vec<Option<&node::Node>>) -> Vec<Option<&node::Nod
     for n in nodes.iter() {
         match n {
             Some(n) => {
-                match n.left.as_ref() {
+                match n.left.0.as_ref() {
                     Some(n) => tmp_nodes.push(Some(n)),
                     None => tmp_nodes.push(None),
                 };
-                match n.right.as_ref() {
+                match n.right.0.as_ref() {
                     Some(n) => tmp_nodes.push(Some(n)),
                     None => tmp_nodes.push(None),
                 };
