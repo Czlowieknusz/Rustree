@@ -20,15 +20,6 @@ enum Successor<'a> {
 }
 
 impl Node {
-    pub fn get_depth(&self) -> u32 {
-        match (self.left.0.as_ref(), self.right.0.as_ref()) {
-            (None, None) => 1,
-            (Some(left), None) => left.get_depth() + 1,
-            (None, Some(right)) => right.get_depth() + 1,
-            (Some(left), Some(right)) => cmp::max(left.get_depth(), right.get_depth()) + 1,
-        }
-    }
-
     pub fn add_node(&mut self, value: i32) {
         if self.value == value {
             println!("Value {} already present!", value);
@@ -55,6 +46,27 @@ impl Node {
 }
 
 impl Tree {
+    pub fn get_depth(&self) -> u32 {
+        if self.0.is_none() {
+            return 0;
+        }
+
+        match (
+            self.0.unwrap().as_ref().left.0.as_ref(),
+            self.0.unwrap().as_ref().right.0.as_ref(),
+        ) {
+            (None, None) => 1,
+            (Some(_), None) => self.0.unwrap().as_ref().left.get_depth() + 1,
+            (None, Some(_)) => self.0.unwrap().as_ref().right.get_depth() + 1,
+            (Some(_), Some(_)) => {
+                cmp::max(
+                    self.0.unwrap().as_ref().left.get_depth() + 1,
+                    self.0.unwrap().as_ref().right.get_depth() + 1,
+                ) + 1
+            }
+        }
+    }
+
     fn new(val: i32) -> Tree {
         Tree(Some(Box::new(Node::new(val))))
     }
@@ -147,7 +159,7 @@ mod tests {
 
     #[test]
     fn tree_should_connect_on_middle_node_deleted() {
-        let mut root = Box::new(Node::new(0));
+        let mut root = Tree::new(0);
         root.add_node(1);
         root.add_node(2);
         assert_eq!(root.get_depth(), 3);
