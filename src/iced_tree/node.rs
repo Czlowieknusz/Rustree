@@ -22,6 +22,9 @@ impl Node {
 
 impl Tree {
     pub fn add_node(&mut self, value: i32) {
+        if self.0.is_none() {
+            self.0 = Option::from(Box::new(Node::new(value)))
+        }
         if self.0.as_ref().unwrap().value == value {
             println!("Value {} already present!", value);
             return;

@@ -2,7 +2,6 @@ use iced::{button, Alignment, Button, Column, Element, Row, Sandbox, Text};
 use rand::Rng;
 
 pub mod node;
-use queues::*;
 
 #[derive(Default)]
 pub struct Tree {
@@ -222,6 +221,25 @@ mod tests {
 
         let expected_nodes = vec![None, None];
         assert_eq!(nodes, expected_nodes);
+    }
+
+    #[test]
+    fn should_add_first_element() {
+        let mut root = Tree::new();
+
+        print_tree(root.root.as_ref());
+
+        root.update(Message::AddChild);
+        print_tree(root.root.as_ref());
+
+        root.update(Message::AddChild);
+        print_tree(root.root.as_ref());
+
+        root.update(Message::DelChild);
+        print_tree(root.root.as_ref());
+
+        root.update(Message::DelChild);
+        print_tree(root.root.as_ref());
     }
 
     #[test]
