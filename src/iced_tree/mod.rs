@@ -153,6 +153,12 @@ mod tests {
     use super::*;
 
     #[test]
+    fn padding_for_zero() {
+        let depth = 0;
+        assert_eq!(calc_padding(&depth), 1);
+    }
+
+    #[test]
     fn padding_for_one() {
         let depth = 1;
         assert_eq!(calc_padding(&depth), 3);
@@ -216,5 +222,39 @@ mod tests {
 
         let expected_nodes = vec![None, None];
         assert_eq!(nodes, expected_nodes);
+    }
+
+    #[test]
+    fn should_print_tree_without_crash() {
+        let mut root = node::Tree::new(4);
+        print_tree(&root);
+
+        root.add_node(3);
+        print_tree(&root);
+
+        root.add_node(6);
+        print_tree(&root);
+
+        root.add_node(0);
+        print_tree(&root);
+
+        root.add_node(-2);
+        print_tree(&root);
+
+        // delete
+        root.del_node(3);
+        print_tree(&root);
+
+        root.del_node(6);
+        print_tree(&root);
+
+        root.del_node(0);
+        print_tree(&root);
+
+        root.del_node(-2);
+        print_tree(&root);
+
+        root.del_node(4);
+        print_tree(&root);
     }
 }
