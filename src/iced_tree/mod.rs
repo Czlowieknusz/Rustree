@@ -39,7 +39,7 @@ impl Sandbox for Tree {
                 let mut rng = rand::thread_rng();
                 let val = rng.gen::<i32>() % 10;
                 println!("Trying to delete {}.", val);
-                // self.root.del_node(val);
+                self.root.del_node(val);
             }
         }
     }
